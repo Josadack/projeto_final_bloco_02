@@ -52,7 +52,82 @@ export class ProdutoService{
     }
 
 
-   
+    async countProdutosPorCategoria(nome: string): Promise<any> {  
+
+        const results = await this.pordutoReposiroy.createQueryBuilder('produto')  
+          .innerJoin('produto.categoria', 'categoria')  
+          .where('categoria.nome LIKE :nome', { nome: `%${nome}%` })  
+          .select([  
+            'categoria.nome AS Nome_Categoria',  
+            'COUNT(produto.id) AS Registro',
+            'produto.data_validade As Data_Validadde',  
+            'GROUP_CONCAT(produto.nome) AS Medicamentos' ,
+            'produto.quantidade As Estoque'
+
+          ])  
+          .groupBy('categoria.nome') // Agrupando pelo nome do produto 
+          .addGroupBy('produto.data_validade') 
+          .addGroupBy('produto.quantidade') 
+          .getRawMany()  
+
+        if (results.length === 0) {  
+            throw new HttpException(`⚠️ Nenhum resultado encontrado com o ${nome} `, HttpStatus.NOT_FOUND);  // Trate o erro conforme necessário  
+            }  
+        
+            return {  
+                Informações: " Tabela de Produto 📝 :",  
+                results:  results
+              }; 
+    } 
+
+
+    async findByIntervalo(n: number, n2: number): Promise<Produto[]>{
+
+        const results = await this.pordutoReposiroy.find({
+               where: {
+                      preco: Between(n, n2)
+                  },
+                  relations: {categoria: true,
+                              //usuario: true
+                  },
+                  order: {  
+                      preco: "ASC",  
+                  }
+              })
+
+         if (! results.length)  
+                throw new HttpException(`⚠️ Nenhum intervalo encontrado entre ${n} / ${n2}`, HttpStatus.NOT_FOUND);  // Trate o erro conforme necessário  
+             
+
+        return results;
+      }
+
+
+      async findByPrecoMenor(preco: number): Promise<Produto[]>{
+        return this.pordutoReposiroy.find({
+            where: {  
+                preco: LessThanOrEqual(preco) // filtrar preços menores  
+            },  
+            relations: { categoria: true },  
+            order: {  
+                preco: "ASC",  
+            }
+        })
+    }
+
+
+    async findByPrecoMaior(preco: number): Promise<Produto[]>{
+        return this.pordutoReposiroy.find({
+            where: {  
+                preco: MoreThanOrEqual(preco) //  filtrar preços maiores  
+            },  
+            relations: { categoria: true },  
+            order: {  
+                preco: "DESC",  
+            }  
+        })
+        
+    }
 
     async create(produto: Produto): Promise<Produto>{
 

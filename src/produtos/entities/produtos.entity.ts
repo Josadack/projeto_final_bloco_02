@@ -31,6 +31,7 @@ export class Produto{
     
     @IsNotEmpty()
     @IsPositive()
+    @Column({ type: "int", nullable:false})
     quantidade: number;
 
     @Column({length: 11, nullable:false})
