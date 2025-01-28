@@ -13,7 +13,7 @@ export class CategoriaService{
 
     async findAll(): Promise<Categoria[]>{
         return this.categoriaReposiroy.find({
-            //relations: {produto: true}
+            relations: {produto: true}
         })
     }
 
@@ -21,7 +21,7 @@ export class CategoriaService{
         const categoria = await this.categoriaReposiroy.findOne({
             where: {
                 id
-            },// relations: {produto: true}
+            }, relations: {produto: true}
         })
         if(!categoria)
             throw new HttpException('Categoria não encontrado! ⛓️‍💥', HttpStatus.NOT_FOUND)
@@ -35,7 +35,7 @@ export class CategoriaService{
            const categoria = await this.categoriaReposiroy.find({
             where: {
                 nome: ILike(`%${nome}%`)
-            }, //relations: {produto: true}
+            },  relations: {produto: true}
         })
         
         const mensagem = categoria.length > 0
@@ -56,6 +56,9 @@ export class CategoriaService{
     async update(categoria: Categoria): Promise<Categoria>{
 
         await this.findById(categoria.id)
+
+        if(!categoria.id || categoria.id < 0)
+            throw new HttpException('⚠️ Por favor Verificar ID', HttpStatus.BAD_REQUEST)
 
         return await this.categoriaReposiroy.save(categoria)
     }
