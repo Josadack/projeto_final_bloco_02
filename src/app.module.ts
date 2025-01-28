@@ -8,6 +8,7 @@ import { ProdutoModule } from './produtos/produto.module';
 import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
 import { UsuarioModule } from './usuario/usuario.module';
+import { ProdService } from './data/services/prod.service';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { UsuarioModule } from './usuario/usuario.module';
       isGlobal: true,
     }),
     TypeOrmModule.forRootAsync({
-      useClass: DevService,
+      useClass: ProdService,
       imports: [ConfigModule],
     }),
     CategoriaModule,
